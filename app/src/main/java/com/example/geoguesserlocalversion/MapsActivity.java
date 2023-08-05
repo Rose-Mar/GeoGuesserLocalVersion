@@ -3,6 +3,8 @@ package com.example.geoguesserlocalversion;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,6 +18,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
+    private TextView findPoint;
+    private Button findPointBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +32,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        findPoint = findViewById(R.id.findPoint);
+        
+
+
+
     }
 
     /**
