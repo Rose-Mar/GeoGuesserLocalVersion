@@ -7,7 +7,9 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationRequest;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,6 +27,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.geoguesserlocalversion.databinding.ActivityMapsBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.maps.StreetViewPanoramaFragment;
 import com.google.android.gms.tasks.Task;
 
 import java.util.Collection;
@@ -35,12 +40,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView findPoint;
     private Button findPointBtn;
     private Button locationBtn;
-    protected String latitude, longitude;
+    private Button nextPage;
+    protected double latitude, longitude;
     private LocationRequest locationRequest;
+
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
+
+
 
         final String[] PERMISSIONS = {
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -62,7 +75,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        findPoint = findViewById(R.id.findPoint);
         locationBtn = findViewById(R.id.location);
         locationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +86,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(MapsActivity.this, " Permission granted", Toast.LENGTH_SHORT).show();
 
 
+                    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapsActivity.this);
+
+                    fusedLocationProviderClient.getLastLocation()
+                            .addOnSuccessListener(MapsActivity.this, new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    if(location != null){
+
+                                        latitude = location.getLatitude();
+                                        longitude = location.getLongitude();
+
+                                        LatLng sydney = new LatLng(latitude, longitude);
+                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+                                        Toast.makeText(MapsActivity.this, "Latitude: "+latitude+" Longitude: "+longitude, Toast.LENGTH_SHORT).show();
+
+
+                                    }
+                                }
+                            });
+
 
                     //TODO
                     // check do location is put on
@@ -84,7 +118,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
-        
+
+
+
+        nextPage= findViewById(R.id.nextPage);
+        nextPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
 
@@ -132,7 +176,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+        LatLng sydney = new LatLng(latitude, longitude);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
