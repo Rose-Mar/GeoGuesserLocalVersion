@@ -12,30 +12,56 @@ import com.google.android.gms.maps.SupportStreetViewPanoramaFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
+
+
+public class StreetViewActivity extends AppCompatActivity implements OnStreetViewPanoramaReadyCallback {
+
+
+    double latitude;
+    double longitude;
 
 
 
 
-public class StreetViewActivity extends AppCompatActivity implements OnStreetViewPanoramaReadyCallback
-{
+
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_street_view);
+
+
+
+
         SupportStreetViewPanoramaFragment streetViewPanoramaFragment =
                 (SupportStreetViewPanoramaFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.street_view_panorama);
         streetViewPanoramaFragment.getStreetViewPanoramaAsync(this);
+
+
+
+
+
     }
 
 
 
     @Override
     public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
-        LatLng sanFrancisco = new LatLng(37.754130, -122.447129);
+
+        Intent intent = this.getIntent();
+
+        latitude = intent.getDoubleExtra("latitude", 0);
+        longitude = intent.getDoubleExtra("longitude", 0);
+
+
+
+
+        LatLng sanFrancisco = new LatLng(latitude, longitude);
         streetViewPanorama.setPosition(sanFrancisco);
     }
 

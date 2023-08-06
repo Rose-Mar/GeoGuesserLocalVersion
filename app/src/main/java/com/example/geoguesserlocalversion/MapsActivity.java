@@ -1,5 +1,7 @@
 package com.example.geoguesserlocalversion;
 
+//import static androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.Table.map;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
@@ -9,6 +11,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationRequest;
@@ -24,6 +27,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.geoguesserlocalversion.databinding.ActivityMapsBinding;
@@ -43,6 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button nextPage;
     protected double latitude, longitude;
     private LocationRequest locationRequest;
+    final float NEARBY_CONTACTS_RADIUS  = 1.5f;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
 
@@ -51,19 +56,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
 
 
-
-
-
-
         final String[] PERMISSIONS = {
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
 
         };
-
-//        List<Place.Field> placeFields = Collection.singletonList(PLace.Field.NAME);
-//        FindCurrentPlaceResponse request = FindCurrentPlaceResponse.newInstance(placeFields);
-
 
 
 
@@ -104,6 +101,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         Toast.makeText(MapsActivity.this, "Latitude: "+latitude+" Longitude: "+longitude, Toast.LENGTH_SHORT).show();
 
 
+                                        CircleOptions co = new CircleOptions();
+
+                                        co.center(new LatLng(latitude, longitude));
+                                        co.radius(NEARBY_CONTACTS_RADIUS * 1000);
+//                                        co.strokeColor(mActivity.getResources().getColor(R.color.map_blue));
+                                        co.fillColor(Color.TRANSPARENT);
+                                        mMap.addCircle(co);
+
+
                                     }
                                 }
                             });
@@ -126,6 +132,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
+                intent.putExtra("latitude",latitude );
+                intent.putExtra("longitude",longitude );
                 startActivity(intent);
             }
         });
