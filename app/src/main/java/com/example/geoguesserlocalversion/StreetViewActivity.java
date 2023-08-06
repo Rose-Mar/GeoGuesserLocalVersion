@@ -36,6 +36,10 @@ public class StreetViewActivity extends AppCompatActivity implements OnStreetVie
 
 
 
+        Intent intent = this.getIntent();
+
+        latitude = intent.getDoubleExtra("latitude", 0);
+        longitude = intent.getDoubleExtra("longitude", 0);
 
         SupportStreetViewPanoramaFragment streetViewPanoramaFragment =
                 (SupportStreetViewPanoramaFragment) getSupportFragmentManager()
@@ -53,16 +57,8 @@ public class StreetViewActivity extends AppCompatActivity implements OnStreetVie
     @Override
     public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
 
-        Intent intent = this.getIntent();
-
-        latitude = intent.getDoubleExtra("latitude", 0);
-        longitude = intent.getDoubleExtra("longitude", 0);
-
-
-
-
-        LatLng sanFrancisco = new LatLng(latitude, longitude);
-        streetViewPanorama.setPosition(sanFrancisco);
+        LatLng randomLocation = new LatLng(latitude, longitude);
+        streetViewPanorama.setPosition(randomLocation);
     }
 
 

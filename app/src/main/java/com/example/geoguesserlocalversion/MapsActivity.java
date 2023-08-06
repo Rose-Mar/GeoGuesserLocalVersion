@@ -4,6 +4,7 @@ package com.example.geoguesserlocalversion;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
@@ -12,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.icu.text.NumberFormat;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationRequest;
@@ -27,6 +29,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -34,34 +37,34 @@ import com.example.geoguesserlocalversion.databinding.ActivityMapsBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.maps.StreetViewPanoramaFragment;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.slider.LabelFormatter;
+import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.slider.Slider;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Currency;
+import java.util.List;
+import java.util.Random;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
-    private TextView findPoint;
-    private Button findPointBtn;
     private Button locationBtn;
     private Button nextPage;
+    private Slider slider;
+    private float sliderValue;
+    private  Circle circle;
+    private LatLng curLocation;
     protected double latitude, longitude;
-    private LocationRequest locationRequest;
-    final float NEARBY_CONTACTS_RADIUS  = 1.5f;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-        final String[] PERMISSIONS = {
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION
-
-        };
-
 
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
@@ -76,6 +79,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
 
                 if(ContextCompat.checkSelfPermission(
                         MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)==
@@ -94,20 +99,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         latitude = location.getLatitude();
                                         longitude = location.getLongitude();
 
-                                        LatLng sydney = new LatLng(latitude, longitude);
-                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                                        curLocation = new LatLng(latitude, longitude);
+                                        mMap.addMarker(new MarkerOptions().position(curLocation).title("Marker in curLocation"));
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(curLocation));
 
                                         Toast.makeText(MapsActivity.this, "Latitude: "+latitude+" Longitude: "+longitude, Toast.LENGTH_SHORT).show();
 
 
-                                        CircleOptions co = new CircleOptions();
-
-                                        co.center(new LatLng(latitude, longitude));
-                                        co.radius(NEARBY_CONTACTS_RADIUS * 1000);
-//                                        co.strokeColor(mActivity.getResources().getColor(R.color.map_blue));
-                                        co.fillColor(Color.TRANSPARENT);
-                                        mMap.addCircle(co);
 
 
                                     }
@@ -115,10 +113,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             });
 
 
+
+                    slider = findViewById(R.id.slider);
+
+                    circle = mMap.addCircle(new CircleOptions()
+                            .center(new LatLng(latitude, longitude))
+                            .radius(1000)
+                            .strokeColor(Color.RED)
+                            .fillColor(Color.BLUE));
+
+                    slider.addOnChangeListener(new Slider.OnChangeListener() {
+                        @Override
+                        public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                            sliderValue = value;
+
+
+                            circle.remove();
+
+                            circle = mMap.addCircle(new CircleOptions()
+                                    .center(new LatLng(latitude, longitude))
+                                    .radius(1000*sliderValue)
+                                    .strokeColor(Color.RED));
+                        }
+                    });
+
+
                     //TODO
                     // check do location is put on
                 }
                 else {
+
+                    final String[] PERMISSIONS = {
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+
+                    };
+
                     requestMultiplePermissionLauncher.launch(PERMISSIONS);
                 }
 
@@ -131,18 +161,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         nextPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                LatLng randomLocation = getRandomLocation(curLocation,(int)(1000*sliderValue));
+                Toast.makeText(MapsActivity.this, "Random Location: " + randomLocation, Toast.LENGTH_SHORT).show();
+
+
+
                 Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
-                intent.putExtra("latitude",latitude );
-                intent.putExtra("longitude",longitude );
+                intent.putExtra("latitude",randomLocation.latitude );
+                intent.putExtra("longitude",randomLocation.longitude );
                 startActivity(intent);
             }
         });
-
-
-
     }
 
+    private LatLng getRandomLocation(LatLng point, int radius){
+        List<LatLng> randomPoints = new ArrayList<>();
+        List<Float> randomDistances = new ArrayList<>();
+        Location myLocation = new Location("");
+        myLocation.setLatitude(point.latitude);
+        myLocation.setLongitude(point.longitude);
 
+        //This is to generate 10 random points
+        for(int i = 0; i<10; i++) {
+            double x0 = point.latitude;
+            double y0 = point.longitude;
+
+            Random random = new Random();
+
+            // Convert radius from meters to degrees
+            double radiusInDegrees = radius / 111000f;
+
+            double u = random.nextDouble();
+            double v = random.nextDouble();
+            double w = radiusInDegrees * Math.sqrt(u);
+            double t = 2 * Math.PI * v;
+            double x = w * Math.cos(t);
+            double y = w * Math.sin(t);
+
+            // Adjust the x-coordinate for the shrinking of the east-west distances
+            double new_x = x / Math.cos(y0);
+
+            double foundLatitude = new_x + x0;
+            double foundLongitude = y + y0;
+            LatLng randomLatLng = new LatLng(foundLatitude, foundLongitude);
+            randomPoints.add(randomLatLng);
+            Location l1 = new Location("");
+            l1.setLatitude(randomLatLng.latitude);
+            l1.setLongitude(randomLatLng.longitude);
+            randomDistances.add(l1.distanceTo(myLocation));
+        }
+        //Get nearest point to the centre
+
+        int indexOfNearestPointToCentre = randomDistances.indexOf(Collections.min(randomDistances));
+        return randomPoints.get(indexOfNearestPointToCentre);
+
+    }
 
     private boolean isGPSEnable(){
         LocationManager locationManager = null;
@@ -184,8 +258,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(latitude, longitude);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng curLocation = new LatLng(latitude, longitude);
+        mMap.addMarker(new MarkerOptions().position(curLocation).title("Marker in curLocation"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(curLocation));
     }
 }
