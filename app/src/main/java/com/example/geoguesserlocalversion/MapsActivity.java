@@ -20,6 +20,7 @@ import android.location.LocationRequest;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
-    private Button locationBtn;
+    private ImageButton locationBtn;
     private Button nextPage;
     private Slider slider;
     private float sliderValue;
@@ -176,14 +177,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private LatLng getRandomLocation(LatLng point, int radius){
-        List<LatLng> randomPoints = new ArrayList<>();
-        List<Float> randomDistances = new ArrayList<>();
         Location myLocation = new Location("");
         myLocation.setLatitude(point.latitude);
         myLocation.setLongitude(point.longitude);
 
         //This is to generate 10 random points
-        for(int i = 0; i<10; i++) {
+
             double x0 = point.latitude;
             double y0 = point.longitude;
 
@@ -205,16 +204,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double foundLatitude = new_x + x0;
             double foundLongitude = y + y0;
             LatLng randomLatLng = new LatLng(foundLatitude, foundLongitude);
-            randomPoints.add(randomLatLng);
-            Location l1 = new Location("");
-            l1.setLatitude(randomLatLng.latitude);
-            l1.setLongitude(randomLatLng.longitude);
-            randomDistances.add(l1.distanceTo(myLocation));
-        }
-        //Get nearest point to the centre
 
-        int indexOfNearestPointToCentre = randomDistances.indexOf(Collections.min(randomDistances));
-        return randomPoints.get(indexOfNearestPointToCentre);
+            return randomLatLng;
+
 
     }
 
@@ -260,6 +252,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Add a marker in Sydney and move the camera
         LatLng curLocation = new LatLng(latitude, longitude);
         mMap.addMarker(new MarkerOptions().position(curLocation).title("Marker in curLocation"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(curLocation));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curLocation,10));
     }
 }
