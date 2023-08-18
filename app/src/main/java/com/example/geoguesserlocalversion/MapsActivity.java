@@ -1,7 +1,5 @@
 package com.example.geoguesserlocalversion;
 
-//import static androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.Table.map;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -13,15 +11,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.icu.text.NumberFormat;
 import android.location.Location;
 import android.location.LocationManager;
-import android.location.LocationRequest;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -36,18 +31,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.geoguesserlocalversion.databinding.ActivityMapsBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.maps.StreetViewPanoramaFragment;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.slider.LabelFormatter;
-import com.google.android.material.slider.RangeSlider;
+
 import com.google.android.material.slider.Slider;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Currency;
-import java.util.List;
-import java.util.Random;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -59,6 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private float sliderValue;
     private  Circle circle;
     private LatLng curLocation;
+    private float radius;
     protected double latitude, longitude;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -163,65 +150,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
 
-                LatLng randomLocation = getRandomLocation(curLocation,(int)(1000*sliderValue));
-                Toast.makeText(MapsActivity.this, "Random Location: " + randomLocation, Toast.LENGTH_SHORT).show();
-
-
 
                 Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
-                intent.putExtra("latitude",randomLocation.latitude );
-                intent.putExtra("longitude",randomLocation.longitude );
+                intent.putExtra("latitude",curLocation.latitude );
+                intent.putExtra("longitude",curLocation.longitude );
+
+                radius= (int)(sliderValue*1000);
+
+                intent.putExtra("radius",(int)radius );
                 startActivity(intent);
             }
         });
     }
-
-    private LatLng getRandomLocation(LatLng point, int radius){
-        Location myLocation = new Location("");
-        myLocation.setLatitude(point.latitude);
-        myLocation.setLongitude(point.longitude);
-
-        //This is to generate 10 random points
-
-            double x0 = point.latitude;
-            double y0 = point.longitude;
-
-            Random random = new Random();
-
-            // Convert radius from meters to degrees
-            double radiusInDegrees = radius / 111000f;
-
-            double u = random.nextDouble();
-            double v = random.nextDouble();
-            double w = radiusInDegrees * Math.sqrt(u);
-            double t = 2 * Math.PI * v;
-            double x = w * Math.cos(t);
-            double y = w * Math.sin(t);
-
-            // Adjust the x-coordinate for the shrinking of the east-west distances
-            double new_x = x / Math.cos(y0);
-
-            double foundLatitude = new_x + x0;
-            double foundLongitude = y + y0;
-            LatLng randomLatLng = new LatLng(foundLatitude, foundLongitude);
-
-            return randomLatLng;
-
-
-    }
-
-    private boolean isGPSEnable(){
-        LocationManager locationManager = null;
-        boolean isEnable = false;
-
-        if(locationManager == null){
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        }
-
-        isEnable = locationManager.isProviderEnabled((LocationManager.GPS_PROVIDER));
-        return isEnable;
-    }
+//
+//    private boolean isGPSEnable(){
+//        LocationManager locationManager = null;
+//        boolean isEnable = false;
+//
+//        if(locationManager == null){
+//            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//
+//        }
+//
+//        isEnable = locationManager.isProviderEnabled((LocationManager.GPS_PROVIDER));
+//        return isEnable;
+//    }
 
 
     private ActivityResultLauncher<String[]> requestMultiplePermissionLauncher =
@@ -249,9 +202,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
+
         LatLng curLocation = new LatLng(latitude, longitude);
-        mMap.addMarker(new MarkerOptions().position(curLocation).title("Marker in curLocation"));
+//        mMap.addMarker(new MarkerOptions().position(curLocation).title("Marker in curLocation"));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curLocation,10));
     }
 }
