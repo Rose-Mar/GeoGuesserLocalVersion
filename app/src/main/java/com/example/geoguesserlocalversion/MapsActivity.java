@@ -43,7 +43,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button nextPage;
     private Slider slider;
     private float sliderValue;
-    private  Circle circle;
+    private Circle circle;
     private LatLng curLocation;
     private float radius;
     protected double latitude, longitude;
@@ -69,10 +69,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View view) {
 
 
-
-                if(ContextCompat.checkSelfPermission(
-                        MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)==
-                        PackageManager.PERMISSION_GRANTED){
+                if (ContextCompat.checkSelfPermission(
+                        MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(MapsActivity.this, " Permission granted", Toast.LENGTH_SHORT).show();
 
 
@@ -82,7 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .addOnSuccessListener(MapsActivity.this, new OnSuccessListener<Location>() {
                                 @Override
                                 public void onSuccess(Location location) {
-                                    if(location != null){
+                                    if (location != null) {
 
                                         latitude = location.getLatitude();
                                         longitude = location.getLongitude();
@@ -91,15 +90,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         mMap.addMarker(new MarkerOptions().position(curLocation).title("Marker in curLocation"));
                                         mMap.moveCamera(CameraUpdateFactory.newLatLng(curLocation));
 
-                                        Toast.makeText(MapsActivity.this, "Latitude: "+latitude+" Longitude: "+longitude, Toast.LENGTH_SHORT).show();
-
-
+                                        Toast.makeText(MapsActivity.this, "Latitude: " + latitude + " Longitude: " + longitude, Toast.LENGTH_SHORT).show();
 
 
                                     }
                                 }
                             });
-
 
 
                     slider = findViewById(R.id.slider);
@@ -120,16 +116,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             circle = mMap.addCircle(new CircleOptions()
                                     .center(new LatLng(latitude, longitude))
-                                    .radius(1000*sliderValue)
+                                    .radius(1000 * sliderValue)
                                     .strokeColor(Color.RED));
                         }
                     });
 
-
-                    //TODO
-                    // check do location is put on
-                }
-                else {
+                } else {
 
                     final String[] PERMISSIONS = {
                             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -144,20 +136,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-
-        nextPage= findViewById(R.id.nextPage);
+        nextPage = findViewById(R.id.nextPage);
         nextPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
 
                 Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
-                intent.putExtra("latitude",curLocation.latitude );
-                intent.putExtra("longitude",curLocation.longitude );
+                intent.putExtra("latitude", curLocation.latitude);
+                intent.putExtra("longitude", curLocation.longitude);
 
-                radius= (int)(sliderValue*1000);
+                radius = (int) (sliderValue * 1000);
 
-                intent.putExtra("radius",(int)radius );
+                intent.putExtra("radius", (int) radius);
                 startActivity(intent);
             }
         });
@@ -178,26 +169,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private ActivityResultLauncher<String[]> requestMultiplePermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted ->{
-                if(isGranted.containsValue(false)){
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), isGranted -> {
+                if (isGranted.containsValue(false)) {
 
-                    //TODO
                     Toast.makeText(this, "Permision Granted", Toast.LENGTH_SHORT).show();
 
-                }else{
+                } else {
 
                 }
             });
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+    
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -205,6 +186,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LatLng curLocation = new LatLng(latitude, longitude);
 //        mMap.addMarker(new MarkerOptions().position(curLocation).title("Marker in curLocation"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curLocation,10));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curLocation, 10));
     }
 }

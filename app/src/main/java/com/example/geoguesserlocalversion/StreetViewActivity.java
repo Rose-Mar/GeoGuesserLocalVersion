@@ -30,19 +30,13 @@ public class StreetViewActivity extends AppCompatActivity implements OnStreetVie
     double latitude;
     double longitude;
     int radius;
-int i=0;
+    int i = 0;
     private Button giveUpBtn;
     private Button answer;
 
     private static final int STREETVIEW_MAX_DISTANCE = 100;
-    private LatLng latLng = new LatLng(40.7140, -74.0062);
     private LatLng lng;
     private boolean isWorking;
-
-
-
-
-
 
 
     @Override
@@ -56,17 +50,11 @@ int i=0;
         longitude = intent.getDoubleExtra("longitude", 0);
         radius = intent.getIntExtra("radius", 0);
 
-         lng = new LatLng(latitude, longitude);
+        lng = new LatLng(latitude, longitude);
 
 
-
-
-
-        SupportStreetViewPanoramaFragment streetViewPanoramaFragment =
-                (SupportStreetViewPanoramaFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.street_view_panorama);
+        SupportStreetViewPanoramaFragment streetViewPanoramaFragment = (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(R.id.street_view_panorama);
         streetViewPanoramaFragment.getStreetViewPanoramaAsync(this);
-
 
 
         giveUpBtn = findViewById(R.id.giveUpBtn);
@@ -82,7 +70,7 @@ int i=0;
         });
 
 
-        answer= findViewById(R.id.answer);
+        answer = findViewById(R.id.answer);
         answer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,47 +84,39 @@ int i=0;
         });
 
 
-
-
-
-
-
     }
 
     @Override
     public void onStreetViewPanoramaReady(StreetViewPanorama streetViewPanorama) {
 
-    LatLng randomLocation = getRandomLocation(lng, radius);
-    streetViewPanorama.setPosition(randomLocation);
+        LatLng randomLocation = getRandomLocation(lng, radius);
+        streetViewPanorama.setPosition(randomLocation);
 
-    streetViewPanorama.setOnStreetViewPanoramaChangeListener(new StreetViewPanorama.OnStreetViewPanoramaChangeListener() {
-        @Override
-        public void onStreetViewPanoramaChange(StreetViewPanoramaLocation location) {
-            if (location != null && location.links != null && location.links.length > 0) {
-                isWorking=true;
-                Toast.makeText(StreetViewActivity.this, "Działa", Toast.LENGTH_SHORT).show();
+        streetViewPanorama.setOnStreetViewPanoramaChangeListener(new StreetViewPanorama.OnStreetViewPanoramaChangeListener() {
+            @Override
+            public void onStreetViewPanoramaChange(StreetViewPanoramaLocation location) {
+                if (location != null && location.links != null && location.links.length > 0) {
+                    isWorking = true;
+                    Toast.makeText(StreetViewActivity.this, "Działa", Toast.LENGTH_SHORT).show();
 
-            } else {
-                isWorking=false;
-                Toast.makeText(StreetViewActivity.this, "nie działa", Toast.LENGTH_SHORT).show();
+                } else {
+                    isWorking = false;
+                    Toast.makeText(StreetViewActivity.this, "nie działa", Toast.LENGTH_SHORT).show();
 
+                }
             }
-        }
-    });
-    i++;
-}
+        });
+        i++;
+    }
 
 
-    private LatLng getRandomLocation(LatLng point, int radius){
-
-
+    private LatLng getRandomLocation(LatLng point, int radius) {
 
 
         Location myLocation = new Location("");
         myLocation.setLatitude(point.latitude);
         myLocation.setLongitude(point.longitude);
 
-        //This is to generate 10 random points
 
         double x0 = point.latitude;
         double y0 = point.longitude;
@@ -164,9 +144,6 @@ int i=0;
 
 
     }
-
-
-
 
 
 }
