@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "667630533483",
+    "project_id": "gglv-5c873",
+    "storage_bucket": "gglv-5c873.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667630533483:android:a418d7426e3f9e79e22a2e",
+        "android_client_info": {
+          "package_name": "com.example.geoguesserlocalversion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "667630533483-10b4d9llf0nre7ssb526ppv5pdq2i3ma.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLvGA-52x5oTJ3iYdc8RnXCb1VQEEeLGU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "667630533483-10b4d9llf0nre7ssb526ppv5pdq2i3ma.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

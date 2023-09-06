@@ -28,6 +28,7 @@ public class StreetViewActivity extends AppCompatActivity implements OnStreetVie
 
     private StreetViewPanorama streetViewPanorama;
     private boolean isStreetViewLoaded = false;
+    private LatLng randomLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +49,8 @@ public class StreetViewActivity extends AppCompatActivity implements OnStreetVie
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(StreetViewActivity.this, MapsActivity2.class);
-                intent.putExtra("latitude", latitude);
-                intent.putExtra("longitude", longitude);
+                intent.putExtra("latitude", randomLocation.latitude);
+                intent.putExtra("longitude", randomLocation.longitude);
                 startActivity(intent);
             }
         });
@@ -59,9 +60,10 @@ public class StreetViewActivity extends AppCompatActivity implements OnStreetVie
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(StreetViewActivity.this, EndScreen.class);
-                intent.putExtra("latitude", latitude);
-                intent.putExtra("longitude", longitude);
+                intent.putExtra("latitude", randomLocation.latitude);
+                intent.putExtra("longitude", randomLocation.longitude);
                 startActivity(intent);
+
             }
         });
     }
@@ -79,6 +81,7 @@ public class StreetViewActivity extends AppCompatActivity implements OnStreetVie
                 @Override
                 public void onStreetViewPanoramaChange(StreetViewPanoramaLocation location) {
                     if (location != null && location.links != null && location.links.length > 0) {
+                        randomLocation = location.position;
                         isStreetViewLoaded = true;
                         onStreetViewLoaded();
                     } else {
@@ -116,7 +119,6 @@ public class StreetViewActivity extends AppCompatActivity implements OnStreetVie
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                Toast.makeText(StreetViewActivity.this, "Działa", Toast.LENGTH_SHORT).show();
             }
         });
     }

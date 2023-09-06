@@ -60,7 +60,21 @@ public class EndScreen extends AppCompatActivity {
 
 
                                 textView = findViewById(R.id.textView);
-                                if (latitude == latitudePoint && longitude == longitudePoint) {
+
+                                final int R = 6371; // Radius of the earth
+
+                                double latDistance = Math.toRadians(latitudePoint - latitude);
+                                double lonDistance = Math.toRadians(longitudePoint - longitude);
+                                double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                                        + Math.cos(Math.toRadians(latitude)) * Math.cos(Math.toRadians(latitudePoint))
+                                        * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+                                double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                double distance = R * c * 1000; // convert to meters
+
+
+
+//                                =acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371 (6371 is Earth radius in km.)
+                                if (distance<100) {
 
 
                                     textView.setText("Congratulation!");

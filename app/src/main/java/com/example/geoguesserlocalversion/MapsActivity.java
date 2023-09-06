@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+//import com.example.geoguesserlocalversion.ui.login.LoginActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,7 +40,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
-    private ImageButton locationBtn;
+    private ImageButton locationBtn, loginBtn;
     private Button nextPage;
     private Slider slider;
     private float sliderValue;
@@ -152,6 +153,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
             }
         });
+
+
+
+        loginBtn = findViewById(R.id.loginBtn);
+        loginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+//
+//                Intent intent = new Intent(MapsActivity.this, LoginActivity.class);
+//                startActivity(intent);
+            }
+        });
+
+
+
+
+
     }
 //
 //    private boolean isGPSEnable(){
