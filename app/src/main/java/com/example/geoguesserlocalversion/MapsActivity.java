@@ -41,7 +41,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private ImageButton locationBtn, loginBtn;
-    private Button nextPage;
+    private Button nextPage, testBtn;
     private Slider slider;
     private float sliderValue;
     private Circle circle;
@@ -154,6 +154,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        testBtn = findViewById(R.id.testBtn);
+        testBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                Intent intent = new Intent(MapsActivity.this, MapsActivity3.class);
+                startActivity(intent);
+            }
+        });
 
 
         loginBtn = findViewById(R.id.loginBtn);
