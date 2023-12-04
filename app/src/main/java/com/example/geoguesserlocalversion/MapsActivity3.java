@@ -48,7 +48,13 @@ public class MapsActivity3 extends AppCompatActivity implements OnMapReadyCallba
     private double desiredLatitude;
     private double desiredLongitude;
     private LatLng curLocation;
+    private double placesLat, placesLng;
+    private LatLng placesLatLng;
+    private int radius;
     LatLng randElem;
+    LatLng elem;
+
+    String type;
 
     private Button nextPage;
 
@@ -66,6 +72,19 @@ public class MapsActivity3 extends AppCompatActivity implements OnMapReadyCallba
 
         mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFrag.getMapAsync(this);
+
+
+        Intent intent = this.getIntent();
+        desiredLatitude = intent.getDoubleExtra("latitude", 0);
+        desiredLongitude = intent.getDoubleExtra("longitude", 0);
+        curLocation = new LatLng(desiredLatitude,desiredLongitude);
+        radius = intent.getIntExtra("radius",0);
+
+        placesLatLng = getRandomLocation(curLocation,radius);
+
+
+
+
     }
 
     @Override
@@ -84,19 +103,21 @@ public class MapsActivity3 extends AppCompatActivity implements OnMapReadyCallba
                         @Override
                         public void onSuccess(Location location) {
                             if (location != null) {
-                                desiredLatitude = location.getLatitude();
-                                desiredLongitude = location.getLongitude();
-
-                                curLocation = new LatLng(desiredLatitude, desiredLongitude);
+//                                desiredLatitude = location.getLatitude();
+//                                desiredLongitude = location.getLongitude();
+//
+//                                curLocation = new LatLng(desiredLatitude, desiredLongitude);
                                 mGoogleMap.addMarker(new MarkerOptions().position(curLocation).title("Marker in curLocation"));
                                 mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(curLocation));
 
                                 Toast.makeText(MapsActivity3.this, "Latitude: " + desiredLatitude + " Longitude: " + desiredLongitude, Toast.LENGTH_SHORT).show();
 
-                                
+
+
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
+
                                         apiRequest();
                                     }
                                 });
@@ -104,8 +125,8 @@ public class MapsActivity3 extends AppCompatActivity implements OnMapReadyCallba
                         }
                     });
 
-            LatLng location = new LatLng(desiredLatitude, desiredLongitude);
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+//            LatLng location = new LatLng(desiredLatitude, desiredLongitude);
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curLocation, 15));
 
 
 
@@ -119,20 +140,47 @@ public class MapsActivity3 extends AppCompatActivity implements OnMapReadyCallba
 
 
                 Intent intent = new Intent(MapsActivity3.this, StreetViewActivity.class);
-                intent.putExtra("latitude", randElem.latitude);
-                intent.putExtra("longitude", randElem.longitude);
+                intent.putExtra("latitude", elem.latitude);
+                intent.putExtra("longitude", elem.longitude);
                 startActivity(intent);
             }
         });
     }
 
     protected void apiRequest() {
+
+
+        List <String> attractionList  = new ArrayList();
+//        attractionList.add("amusement_park");
+//        attractionList.add("hindu_temple");
+//        attractionList.add("mosque");
+//        attractionList.add("park");
+        attractionList.add("church");
+//        attractionList.add("museum");
+
+//        attractionList.add("rv_park");
+//        attractionList.add("synagogue");
+//        attractionList.add("tourist_attraction");
+//        attractionList.add("zoo");
+
+
+
+        for (int i = 0; i<attractionList.size(); i++){
+
+            if (type == null){
+                type = attractionList.get(i);
+            }else {
+                type += "," + attractionList.get(i);
+            }
+        }
+
         String apiKey = getResources().getString(R.string.google_api_key);
 
-        String urlString = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + desiredLatitude + "," + desiredLongitude +
-                "&radius=5000&type=bar|restaurant&key=" + apiKey;
+//        String urlString = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + desiredLatitude + "," + desiredLongitude +
+//                "&radius=5000&type=bar|restaurant&key=" + apiKey;
 // najbliższe lokalizacji zrobic jutro
-//        https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=50.0284435,19.9200552&rankby=distance&type=bar&key=AIzaSyDgz7IoHLdTme0Hoh7q284D5UuuLvpk-FQ
+        String urlString = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + placesLatLng.latitude + "," + placesLatLng.longitude +
+                "&rankby=distance&type="+ type +"&key=" + apiKey;
 
 
         new Thread(new Runnable() {
@@ -191,13 +239,42 @@ public class MapsActivity3 extends AppCompatActivity implements OnMapReadyCallba
                     mGoogleMap.addMarker(markerOptions);
                 }
 
-                Random rand = new Random();
+//                Random rand = new Random();
+//
+//                randElem = placesLatLngList.get(rand.nextInt(placesLatLngList.size()));
 
-                randElem = placesLatLngList.get(rand.nextInt(placesLatLngList.size()));
+                elem = placesLatLngList.get(0);
 
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing JSON", e);
             }
         }
+    }
+
+    private LatLng getRandomLocation(LatLng point, int radius) {
+        Location myLocation = new Location("");
+        myLocation.setLatitude(point.latitude);
+        myLocation.setLongitude(point.longitude);
+
+        double x0 = point.latitude;
+        double y0 = point.longitude;
+        Random random = new Random();
+
+        // Convert radius from meters to degrees
+        double radiusInDegrees = radius / 111000f;
+
+        double u = random.nextDouble();
+        double v = random.nextDouble();
+        double w = radiusInDegrees * Math.sqrt(u);
+        double t = 2 * Math.PI * v;
+        double x = w * Math.cos(t);
+        double y = w * Math.sin(t);
+
+        // Adjust the x-coordinate for the shrinking of the east-west distances
+        double new_x = x / Math.cos(y0);
+
+        double foundLatitude = new_x + x0;
+        double foundLongitude = y + y0;
+        return new LatLng(foundLatitude, foundLongitude);
     }
 }
